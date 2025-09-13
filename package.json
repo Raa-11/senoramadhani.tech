@@ -1,27 +1,20 @@
 {
-  "name": "raa-portfolio",
+  "name": "senoramadhani.tech",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.3",
-    "@astrojs/mdx": "^3.1.6",
-    "@astrojs/svelte": "^5.7.0",
-    "@astrojs/tailwind": "^5.1.0",
-    "astro": "^4.15.6",
-    "astro-font": "^0.1.81",
-    "lucide-astro": "^0.441.0",
-    "svelte": "^4.2.19",
-    "tailwindcss": "^3.4.11",
-    "typescript": "^5.6.2"
-  },
-  "devDependencies": {
-    "@types/node": "^22.5.5"
+    "@astrojs/svelte": "^7.1.1",
+    "@tailwindcss/vite": "^4.1.13",
+    "astro": "^5.13.7",
+    "lucide-astro": "^0.544.0",
+    "svelte": "^5.38.10",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2"
   }
 }

@@ -1,33 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-
-@font-face {
-    font-family: "FiraCodeLight";
-    src: url("/fonts/FiraCode-Light.ttf") format("ttf");
-    font-weight: 400;
-    font-style: normal;
+@theme {
+  --font-fira-light: "FiraCodeLight", monospace;
+  --font-fira-bold: "FiraCodeBold", monospace;
+  --font-consolas: "Consolas", monospace;
+  --font-inter-bold: "InterBold", sans-serif;
+  --color-abu-100: #fafafa;
 }
-
-@font-face {
-    font-family: "FiraCodeBold";
-    src: url("/fonts/FiraCode-Bold.ttf") format("ttf");
-    font-weight: bold;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "Consolas";
-    src: url("/fonts/Consolaz.ttf") format("ttf");
-    font-weight: 400;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "InterBold";
-    src: url("Inter-ExtraBold.ttf") format("ttf");
-    font-weight: 900;
-    font-style: normal;
-}
-

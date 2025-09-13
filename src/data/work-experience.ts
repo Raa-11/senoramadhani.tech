@@ -27,11 +27,17 @@ export const workExperiences: WorkExperience[] = [
             "kubernetes",
             "openshift",
             "elasticsearch",
+            "fluentbit",
+            "redpanda",
             "logstash",
             "kibana",
             "harbor",
             "sonarqube",
-            "red hat"
+            "opentelemetery",
+            "grafana",
+            "tempo",
+            "pulumi",
+            "gitlab ci/cd"
         ],
     }
 ];

@@ -1,12 +1,21 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
 
-    export let school: string;
-    export let location: string;
-    export let bachelor: string;
-    export let period: [start: Date, end: Date];
-    export let gpa: [ipk: number, max: number];
-    export let honors: string;
+    let { 
+        school, 
+        location, 
+        bachelor, 
+        period, 
+        gpa, 
+        honors 
+    }: {
+        school: string | null;
+        location: string | null;
+        bachelor: string | null;
+        period: [start: Date, end: Date | null];
+        gpa: [ipk: number, max: number | null];
+        honors: string | null;
+    } = $props();
 </script>
 
 <div transition:fade>
@@ -20,17 +29,19 @@
             <span class="text-sm md:text-base font-serif text-black">{bachelor}</span>
         </div>
         <span class="text-gray-600 font-mono text-sm md:text-base">
-			{period[0].toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+            {period[0].toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
             -
             {#if period[1] === null}
-				Present,
-			{:else}
-				{period[1].toLocaleDateString("en-GB", { month: "short", year: "numeric" })},
-			{/if}
+                Present,
+            {:else}
+                {period[1].toLocaleDateString("en-GB", { month: "short", year: "numeric" })},
+            {/if}
             {location}
-		</span>
+        </span>
     </div>
-    <p class="pt-2 text-sm font-serif text-gray-600">
-        GPA: {gpa[0]}/{gpa[1].toFixed(2)} ({honors})
+   <p class="pt-2 text-sm font-serif text-gray-600">
+        {#if gpa[1] !== null}
+            GPA: {gpa[0]}/{gpa[1].toFixed(2)}{honors ? ` (${honors})` : ""}
+        {/if}   
     </p>
 </div>

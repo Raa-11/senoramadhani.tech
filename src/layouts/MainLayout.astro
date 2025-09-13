@@ -1,11 +1,10 @@
 ---
-
 import { ViewTransitions } from "astro:transitions";
 import SEO, { type Props as SEOProps } from "~/components/SEO.astro";
 import "~/styles/global.css";
 
 export interface Props {
-    seo: SEOProps;
+	seo: SEOProps;
 }
 
 const { seo } = Astro.props;
