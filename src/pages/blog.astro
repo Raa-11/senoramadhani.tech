@@ -1,0 +1,21 @@
+---
+import MainLayout from "~/layouts/MainLayout.astro";
+import { getCollection } from "astro:content";
+import NotesVault from "~/components/views/NotesVault.svelte";
+
+const notes = await getCollection("blog");
+const sortedNotes = notes.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+---
+
+<MainLayout
+  seo={{
+    title: "Blog & Notes",
+  }}
+  bento
+>
+  <div class="w-full flex-1 flex flex-col">
+    <NotesVault notes={sortedNotes} client:load />
+  </div>
+</MainLayout>

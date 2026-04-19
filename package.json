@@ -1,7 +1,10 @@
 {
-  "name": "senoramadhani.tech",
+  "name": "portfolio-rama",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -9,12 +12,19 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/svelte": "^7.1.1",
+    "@astrojs/mdx": "^5.0.3",
+    "@astrojs/partytown": "^2.1.6",
+    "@astrojs/svelte": "^8.0.4",
+    "@hugeicons/core-free-icons": "^4.1.1",
+    "@hugeicons/svelte": "^1.1.2",
     "@tailwindcss/vite": "^4.1.13",
-    "astro": "^5.13.7",
-    "lucide-astro": "^0.544.0",
-    "svelte": "^5.38.10",
+    "astro": "^6.1.5",
+    "clsx": "^2.1.1",
+    "maplibre-gl": "^5.23.0",
+    "svelte": "^5.55.3",
+    "svelte-inview": "^4.0.4",
+    "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   }
 }

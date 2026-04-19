@@ -1,32 +1,28 @@
 ---
-
-import data from "~/data/site";
+import siteData from '~/data/site';
 
 export type Props = {
-    title: string;
-    isPost?: boolean;
-    description?: string;
-    keywords?: string[];
-    thumbnail?: string;
-}
+  title: string;
+  description?: string;
+  keywords?: string[];
+};
 
 const {
-	isPost = false,
-	thumbnail = "",
-	description = data.description,
-	keywords = data.keywords,
-	...props
-} = Astro.props as Props;
+  title,
+  description = siteData.description,
+  keywords = siteData.keywords,
+} = Astro.props;
 
-const { siteName, siteUrl } = data;
-
+const { siteName, siteUrl } = siteData;
 ---
 
-<title>{props.title} | {siteName}</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<meta name="Googlebot" content="noindex, nofollow">
-<link rel="canonical" href={`${siteUrl}${Astro.url.pathname}`} />
+<title>{title} | {siteName}</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="generator" content={Astro.generator} />
 <meta name="description" content={description} />
-<meta name="keywords" content={keywords.join(",").toLowerCase()} />
+<meta name="keywords" content={keywords.join(',').toLowerCase()} />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="canonical" href={`${siteUrl}${Astro.url.pathname}`} />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" href="/favicon.ico" />

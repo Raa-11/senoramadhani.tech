@@ -1,76 +1,77 @@
 ---
 import MainLayout from "~/layouts/MainLayout.astro";
-import { Github, Linkedin, Mail, FileText } from "lucide-astro";
-import WorkExperienceSection from "~/components/section/WorkExperienceSection.svelte";
-import EducationSection from "~/components/section/EducationSection.svelte";
-import SkillSection from "~/components/section/SkillSection.svelte";
-import profile from "../../public/assets/images/profile.webp";
-
-import { educations } from '~/data/education';
-import { workExperiences } from "~/data/work-experience";
-import { skill } from '~/data/skill';
-import siteData from "~/data/site";
-
-const socials = [
-  { icon: Mail, link: siteData.email, label: "Email" },
-  { icon: Github, link: siteData.github, label: "Github" },
-  { icon: Linkedin, link: siteData.linkedin, label: "LinkedIn" },
-  { icon: FileText, link: siteData.cv, label: "CV" },
-];
+import HeroCard from "~/components/bento/HeroCard.svelte";
+import PortraitCard from "~/components/bento/PortraitCard.svelte";
+import NowCard from "~/components/bento/NowCard.svelte";
+import AboutCard from "~/components/bento/AboutCard.svelte";
+import WorkCard from "~/components/bento/WorkCard.svelte";
+import SkillsCard from "~/components/bento/SkillsCard.svelte";
+import EduCard from "~/components/bento/EduCard.svelte";
+import HeatmapCard from "~/components/bento/HeatmapCard.svelte";
+import OSSListCard from "~/components/bento/OSSListCard.svelte";
+import ReposCard from "~/components/bento/ReposCard.svelte";
+import LogCard from "~/components/bento/LogCard.svelte";
+import SignoffCard from "~/components/bento/SignoffCard.svelte";
 ---
 
-<MainLayout seo={{ title: "Home" }}>
-  <main class="mx-auto max-w-[740px] px-2 md:px-4 py-10">
-    <!-- Header -->
-    <header class="flex pb-4">
-      <div class="flex-1 pr-6">
-        <h1 class="text-xl md:text-2xl font-extrabold font-serif text-black">
-          Seno Rama Dhani
-        </h1>
-        <p class="text-sm md:text-base leading-relaxed font-serif text-gray-600 py-2 max-w-60ch">
-          Software engineering is not just about writing code. It’s about solving problems and making lives better.
-        </p>
-        <div class="flex items-center gap-2 pt-2">
-          {socials.map((social) => (
-            <a
-              href={social.link}
-              class="text-gray-600 hover:text-gray-950 p-1 rounded-lg border border-gray-400/80 hover:border-gray-600"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <social.icon size={18} />
-            </a>
-          ))}
-        </div>
-      </div>
-      <a
-        href={siteData.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="relative w-20 h-20 md:w-32 md:h-32 rounded-3xl"
-      >
-        <img
-          src={profile.src}
-          alt="@Raa-11"
-          class="w-full h-full object-cover rounded-2xl object-top"
-        />
-        <div class="absolute inset-0 bg-blue-300/20 rounded-2xl" />
-      </a>
-    </header>
+<MainLayout seo={{ title: "Home" }} bento>
+  <div
+    id="top"
+    class="grid gap-2.5"
+    style="grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(80px, auto);"
+  >
+    <!-- Hero + Portrait -->
+    <div
+      class="col-span-12 row-span-2 md:col-span-8 md:row-span-3"
+      style="min-height: 340px"
+    >
+      <HeroCard client:only="svelte" />
+    </div>
+    <div
+      class="col-span-12 row-span-2 md:col-span-4 md:row-span-3"
+      style="min-height: 340px"
+    >
+      <PortraitCard client:only="svelte" />
+    </div>
 
-    <!-- About Section -->
-    <section class="pt-4 md:pt-8">
-      <h2 class="text-xl md:text-2xl font-bold font-serif text-black pb-4">About</h2>
-      <p class="text-sm md:text-base leading-relaxed font-serif text-gray-600">
-        I’m Seno Rama Dhani, a software engineer based in Bandung, Indonesia.
-        My primary focus is backend engineering, but I’m also proficient in frontend development.
-        Currently, I’m enjoying expanding my knowledge in DevOps.
-      </p>
-    </section>
+    <!-- Now + About -->
+    <div class="col-span-12 row-span-2 md:col-span-6">
+      <NowCard client:only="svelte" />
+    </div>
+    <div class="col-span-12 row-span-2 md:col-span-6">
+      <AboutCard client:only="svelte" />
+    </div>
 
-    <!-- Islands in Astro 5 (no client:visible) -->
-    <WorkExperienceSection workExperiences={workExperiences} client:load />
-    <EducationSection educations={educations} client:load />
-    <SkillSection skills={skill} client:load />
-  </main>
+    <!-- Work -->
+    <div class="col-span-12 row-span-3"><WorkCard client:only="svelte" /></div>
+
+    <!-- Skills marquee -->
+    <div class="col-span-12 flex items-center" style="min-height: 90px">
+      <SkillsCard client:only="svelte" />
+    </div>
+
+    <!-- Edu + Heatmap -->
+    <div class="col-span-12 row-span-2 md:col-span-4">
+      <EduCard client:only="svelte" />
+    </div>
+    <div class="col-span-12 row-span-2 md:col-span-8">
+      <HeatmapCard client:only="svelte" />
+    </div>
+
+    <!-- Repos + Contributions -->
+    <div class="col-span-12 row-span-2 md:col-span-8">
+      <ReposCard client:only="svelte" />
+    </div>
+    <div class="col-span-12 row-span-2 md:col-span-4">
+      <OSSListCard client:only="svelte" />
+    </div>
+
+    <!-- Log + Signoff -->
+    <div class="col-span-12 row-span-2 md:col-span-6">
+      <LogCard client:only="svelte" />
+    </div>
+    <div class="col-span-12 row-span-2 md:col-span-6">
+      <SignoffCard client:only="svelte" />
+    </div>
+  </div>
 </MainLayout>

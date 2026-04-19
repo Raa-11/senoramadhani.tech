@@ -1,14 +1,30 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import svelte from '@astrojs/svelte';
-import tailwindcss from '@tailwindcss/vite';
+import { defineConfig, fontProviders } from 'astro/config';
+import svelte from "@astrojs/svelte";
+import mdx from "@astrojs/mdx";
+import partytown from "@astrojs/partytown";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [svelte()],
-
+  site: "https://senoramadhani.tech",
+  integrations: [
+    svelte(),
+    mdx(),
+    partytown({ config: { forward: ["umami.track"] } }),
+  ],
+  fonts: [
+    {
+      provider: fontProviders.fontsource(),
+      name: 'Fira Code',
+      cssVariable: '--font-fira-code',
+      fallbacks: ['monospace'],
+    },
+  ],
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      noExternal: ['@hugeicons/svelte'],
+    },
   },
-  site: "https://senoramadhani.tech",
 });

@@ -1,12 +1,14 @@
-import type { Education } from "../models/education";
+import unikomLogo from '../assets/images/unikom.webp?url';
 
-export const educations: Education[] = [
-    {
-        school: "Universitas Komputer Indonesia",
-        location: "Bandung, ID",
-        bachelor: "Bachelor of Science, Computer Science",
-        period: [new Date(2017, 9), new Date(2021, 8)],
-        gpa: [3.52, 4.00],
-        honors: "Cumlaude"
-    }
+export const educationData = [
+  {
+    school:   "Universitas Komputer Indonesia",
+    logo:     unikomLogo,
+    location: "Bandung, ID",
+    degree:   "B.Sc. Computer Science",
+    period:   "2017 — 2021",
+    gpa:      "3.52",
+    gpaMax:   "4.00",
+    honors:   "Cum Laude",
+  },
 ];

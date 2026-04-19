@@ -1,9 +1,183 @@
 @import "tailwindcss";
 
-@theme {
-  --font-fira-light: "FiraCodeLight", monospace;
-  --font-fira-bold: "FiraCodeBold", monospace;
-  --font-consolas: "Consolas", monospace;
-  --font-inter-bold: "InterBold", sans-serif;
-  --color-abu-100: #fafafa;
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ── DESIGN TOKENS ── */
+:root {
+  /* dark default */
+  --bg:        #0a0a0a;
+  --bg-2:      #0f0f0f;
+  --card:      #141414;
+  --card-hi:   #1a1a1a;
+  --ink:       #f5f5f5;
+  --ink-2:     #d4d4d4;
+  --muted:     #7a7a7a;
+  --muted-2:   #525252;
+  --line:      rgba(255,255,255,0.08);
+  --line-hi:   rgba(255,255,255,0.16);
+  --accent:    #2ed69b;
+  --accent-on: #0a0a0a;
+  --warn:      #ffb347;
+  --danger:    #ff6b6b;
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --bg:        #f2f2f0;
+  --bg-2:      #ebebe8;
+  --card:      #fafaf8;
+  --card-hi:   #ffffff;
+  --ink:       #0a0a0a;
+  --ink-2:     #2a2a2a;
+  --muted:     #6a6a66;
+  --muted-2:   #a0a09a;
+  --line:      rgba(0,0,0,0.08);
+  --line-hi:   rgba(0,0,0,0.18);
+  --accent:    #1fa877;
+  --accent-on: #ffffff;
+  color-scheme: light;
+}
+
+/* ── TAILWIND THEME MAPPING ── */
+@theme inline {
+  --color-bg:        var(--bg);
+  --color-bg-2:      var(--bg-2);
+  --color-card:      var(--card);
+  --color-card-hi:   var(--card-hi);
+  --color-ink:       var(--ink);
+  --color-ink-2:     var(--ink-2);
+  --color-muted:     var(--muted);
+  --color-muted-2:   var(--muted-2);
+  --color-line:      var(--line);
+  --color-line-hi:   var(--line-hi);
+  --color-accent:    var(--accent);
+  --color-accent-on: var(--accent-on);
+  --color-warn:      var(--warn);
+  --color-danger:    var(--danger);
+
+  --font-sans:    "Geist", "Space Grotesk", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "Geist Mono", ui-monospace, monospace;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+
+  /* keep shadcn tokens working for blog */
+  --color-background:    var(--bg);
+  --color-foreground:    var(--ink);
+  --color-border:        var(--line-hi);
+  --color-muted-foreground: var(--muted);
+  --color-primary:       var(--ink);
+  --color-primary-foreground: var(--bg);
+  --color-secondary:     var(--card-hi);
+  --color-secondary-foreground: var(--ink);
+  --color-card:          var(--card);
+  --color-card-foreground: var(--ink);
+  --color-popover:       var(--card);
+  --color-popover-foreground: var(--ink);
+  --color-input:         var(--line-hi);
+  --color-ring:          var(--accent);
+  --color-destructive:   var(--danger);
+  --color-shadcn-accent: var(--card-hi);
+  --color-accent-foreground: var(--ink);
+}
+
+/* ── THEME TRANSITION ── */
+html {
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+*, *::before, *::after {
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.25s ease,
+    box-shadow 0.35s ease;
+}
+/* don't transition things that shouldn't animate */
+canvas, img, video, svg, [data-no-transition],
+.animate-bento-pulse, .animate-marquee, .animate-bento-blink,
+.animate-skills-fwd, .animate-skills-rev {
+  transition: none !important;
+}
+
+/* ── VIEW TRANSITION (theme toggle) ── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: ease;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+::view-transition-new(root) {
+  animation-name: vt-fade-in;
+}
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── BASE ── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; overflow-y: scroll; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    min-height: 100vh;
+    scrollbar-gutter: stable;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  pre { margin: 0; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes skills-fwd { from { transform: translateX(0); }    to { transform: translateX(-50%); } }
+@keyframes skills-rev { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+
+@keyframes bento-pulse   { 50% { opacity: 0.4; } }
+@keyframes bento-blink   { 50% { opacity: 0; } }
+@keyframes bento-marquee { to { transform: translateX(-33.333%); } }
+@keyframes bento-slideUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bento-fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-bento-pulse   { animation: bento-pulse 2s ease-in-out infinite; }
+@utility animate-bento-blink   { animation: bento-blink 1s steps(2) infinite; }
+@utility animate-bento-slideUp { animation: bento-slideUp .3s ease; }
+@utility animate-marquee       { animation: bento-marquee 22s linear infinite; }
+@utility animate-bento-fadein  { animation: bento-fadeIn .5s ease forwards; }
+@utility animate-skills-fwd    { animation: skills-fwd linear infinite; }
+@utility animate-skills-rev    { animation: skills-rev linear infinite; }
+
+/* ── DOT BACKGROUND (pseudo-element, can't be Tailwind) ── */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+  background-image: radial-gradient(var(--line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+/* ── FILM GRAIN ── */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 200;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");
+  mix-blend-mode: overlay; opacity: .5;
+}
+html[data-theme="light"] body::before {
+  mix-blend-mode: multiply; opacity: .35;
 }

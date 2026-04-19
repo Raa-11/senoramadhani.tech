@@ -1,0 +1,160 @@
+---
+import { getCollection, render } from 'astro:content';
+import MainLayout from '~/layouts/MainLayout.astro';
+import Dock from '~/components/ui/Dock.svelte';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('blog');
+  return notes.map(entry => ({
+    params: { slug: entry.id }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const formatDate = (date: Date) =>
+  new Date(date).toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric',
+  });
+---
+
+<MainLayout seo={{ title: `${entry.data.title} | Blog | Seno Rama Dhani`, description: entry.data.description }} bento>
+  <div class="w-full flex flex-col gap-3">
+
+    <!-- Header card -->
+    <div class="rounded-[14px] bg-card border border-line p-[20px_24px] flex flex-col gap-4">
+
+      <!-- Back + meta row -->
+      <div class="flex items-center justify-between">
+        <a href="/blog" class="back-link">
+          ← back to notes
+        </a>
+        <span class="font-mono text-[11px] text-muted">{formatDate(entry.data.date)}</span>
+      </div>
+
+      <!-- Title -->
+      <div class="border-t border-dashed border-line pt-4">
+        <h1 class="font-display text-[28px] sm:text-[34px] font-bold tracking-[-0.03em] text-ink leading-tight">
+          {entry.data.title}
+        </h1>
+      </div>
+
+      <!-- Meta chips -->
+      <div class="flex flex-wrap items-center gap-2">
+        {entry.data.tags.map((tag: string) => (
+          <span class="tag-chip">#{tag}</span>
+        ))}
+        {entry.data.source && (
+          <span class="source-chip">{entry.data.source} ↗</span>
+        )}
+      </div>
+    </div>
+
+    <!-- Description card -->
+    <div class="rounded-[14px] bg-card border border-line px-6 py-5">
+      <p class="text-[15px] text-muted leading-[1.8] italic">
+        {entry.data.description}
+      </p>
+    </div>
+
+    <!-- Content card -->
+    <div class="rounded-[14px] bg-card border border-line px-8 py-8">
+      <div class="prose-content">
+        <Content />
+      </div>
+    </div>
+
+  </div>
+</MainLayout>
+
+<style>
+  .back-link {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .back-link:hover { opacity: 0.7; text-decoration: underline; text-underline-offset: 3px; }
+
+  .tag-chip {
+    font-family: var(--font-mono, monospace);
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--card-hi);
+    border: 1px solid var(--line-hi);
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+  .source-chip {
+    font-family: var(--font-mono, monospace);
+    font-size: 10px;
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 8%, transparent);
+    border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+
+  /* Prose content styling */
+  .prose-content {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--ink-2);
+  }
+  .prose-content :global(h1),
+  .prose-content :global(h2),
+  .prose-content :global(h3) {
+    font-family: var(--font-display, sans-serif);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+  }
+  .prose-content :global(h2) { font-size: 20px; }
+  .prose-content :global(h3) { font-size: 17px; }
+  .prose-content :global(p) { margin: 0 0 1.2em; }
+  .prose-content :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-content :global(code) {
+    font-family: var(--font-mono, monospace);
+    font-size: 13px;
+    background: var(--card-hi);
+    border: 1px solid var(--line-hi);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent);
+  }
+  .prose-content :global(pre) {
+    background: var(--card-hi);
+    border: 1px solid var(--line-hi);
+    border-radius: 10px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 1.5em 0;
+  }
+  .prose-content :global(pre code) {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--ink-2);
+  }
+  .prose-content :global(blockquote) {
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+    color: var(--muted);
+    font-style: italic;
+    margin: 1.5em 0;
+  }
+  .prose-content :global(ul), .prose-content :global(ol) {
+    padding-left: 1.5em;
+    margin: 0 0 1.2em;
+  }
+  .prose-content :global(li) { margin-bottom: 0.4em; }
+  .prose-content :global(strong) { color: var(--ink); font-weight: 600; }
+</style>

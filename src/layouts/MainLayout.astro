@@ -1,27 +1,63 @@
 ---
-import { ViewTransitions } from "astro:transitions";
+import { getImage } from "astro:assets";
+import { ClientRouter } from "astro:transitions";
 import SEO, { type Props as SEOProps } from "~/components/SEO.astro";
+import TopStrip from "~/components/ui/TopStrip.svelte";
+import Dock from "~/components/ui/Dock.svelte";
+import logoRImg from "~/assets/images/logo-r.png";
 import "~/styles/global.css";
 
-export interface Props {
-	seo: SEOProps;
+interface Props {
+  seo: SEOProps;
+  bento?: boolean;
 }
+const { seo, bento = false } = Astro.props;
 
-const { seo } = Astro.props;
+const pathname = Astro.url.pathname;
+const segment = pathname === "/" ? "home" : pathname.split("/").filter(Boolean)[0];
+const label = `senoramadhani.tech / ${segment}`;
 
+const logoR = await getImage({ src: logoRImg });
 ---
 
 <!doctype html>
-<html lang="en" class="h-full">
-    <head>
-        <SEO {...seo} />
-        <ViewTransitions/>
-    </head>
-    <body class="h-full bg-abu-100 p-4 md:p-10">
-    <div class="fixed z-50 top-0 left-0 w-full h-4 bg-gray-900"></div>
-    <div class="fixed z-50 top-0 left-0 w-40 h-7 bg-gray-900 group cursor-pointer flex items-center justify-center rounded-r-lg border border-gray-900">
-        <a href="/bookmarks" class="invisible group-hover:visible font-mono text-sm text-abu-100">Bookmarks</a>
-    </div>
-    <slot/>
-    </body>
+<html lang="en" data-theme="dark" class="scroll-smooth">
+  <head>
+    <SEO {...seo} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Restore theme before first paint + after every page swap -->
+    <script is:inline>
+      function applyTheme() {
+        try {
+          var t = localStorage.getItem('bento-theme');
+          if (t) document.documentElement.dataset.theme = t;
+        } catch(e) {}
+      }
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
+    </script>
+    <ClientRouter />
+    <script
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="63887aab-f3bd-4f8e-8ee7-a8acce1c722d"
+      type="text/partytown"
+    ></script>
+  </head>
+  <body>
+    {bento
+      ? (
+        <div class="max-w-[1280px] mx-auto px-[clamp(16px,3vw,40px)] pt-5 pb-24 min-h-screen flex flex-col">
+          <TopStrip client:load logoSrc={logoR.src} backHref="/" backLabel={label} />
+          <div class="flex-1 flex flex-col">
+            <slot />
+          </div>
+        </div>
+      )
+      : <div class="relative mx-auto min-h-screen px-6 py-12 sm:py-24"><slot /></div>
+    }
+    <Dock client:load transition:persist="dock" />
+  </body>
 </html>
