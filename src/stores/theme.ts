@@ -4,7 +4,7 @@ type Theme = 'dark' | 'light';
 
 const init: Theme = (typeof document !== 'undefined'
   ? (document.documentElement.dataset.theme as Theme)
-  : 'dark') || 'dark';
+  : 'light') || 'light';
 
 export const theme = writable<Theme>(init);
 
