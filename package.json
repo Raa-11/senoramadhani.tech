@@ -21,6 +21,7 @@
     "astro": "^6.1.5",
     "clsx": "^2.1.1",
     "maplibre-gl": "^5.23.0",
+    "sharp": "^0.34.5",
     "svelte": "^5.55.3",
     "svelte-inview": "^4.0.4",
     "tailwind-merge": "^3.5.0",

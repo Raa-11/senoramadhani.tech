@@ -35,6 +35,9 @@ importers:
       maplibre-gl:
         specifier: ^5.23.0
         version: 5.23.0
+      sharp:
+        specifier: ^0.34.5
+        version: 0.34.5
       svelte:
         specifier: ^5.55.3
         version: 5.55.4
@@ -2190,8 +2193,7 @@ snapshots:
     dependencies:
       svelte: 5.55.4
 
-  '@img/colour@1.1.0':
-    optional: true
+  '@img/colour@1.1.0': {}
 
   '@img/sharp-darwin-arm64@0.34.5':
     optionalDependencies:
@@ -4053,7 +4055,6 @@ snapshots:
       '@img/sharp-win32-arm64': 0.34.5
       '@img/sharp-win32-ia32': 0.34.5
       '@img/sharp-win32-x64': 0.34.5
-    optional: true
 
   shiki@4.0.2:
     dependencies:
