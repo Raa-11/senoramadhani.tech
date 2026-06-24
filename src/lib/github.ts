@@ -42,7 +42,14 @@ function buildHeatmap(days: ContributionDay[]): number[] {
   return cells.slice(0, 53 * 7);
 }
 
+const TTL = 10 * 60 * 1000; // 10 minutes
+
+let _statsCache: { data: GitHubStats; ts: number } | null = null;
+let _contribCache: { data: Contribution[]; ts: number } | null = null;
+
 export async function fetchContributions(username: string): Promise<Contribution[]> {
+  if (_contribCache && Date.now() - _contribCache.ts < TTL) return _contribCache.data;
+
   const res = await fetch(
     `https://api.github.com/search/issues?q=author:${username}+is:public+-user:${username}&sort=updated&per_page=10`,
     { headers: { Accept: 'application/vnd.github+json' } }
@@ -50,7 +57,7 @@ export async function fetchContributions(username: string): Promise<Contribution
   const data = await res.json();
   if (!data.items) return [];
 
-  return data.items.map((item: any) => {
+  const result = data.items.map((item: any) => {
     const isPr = !!item.pull_request;
     const repo = item.repository_url.replace('https://api.github.com/repos/', '');
     let state: 'merged' | 'open' | 'closed' = item.state;
@@ -63,9 +70,13 @@ export async function fetchContributions(username: string): Promise<Contribution
       url: item.html_url,
     };
   });
+  _contribCache = { data: result, ts: Date.now() };
+  return result;
 }
 
 export async function fetchGitHubStats(username: string): Promise<GitHubStats> {
+  if (_statsCache && Date.now() - _statsCache.ts < TTL) return _statsCache.data;
+
   const [userRes, reposRes, contribRes] = await Promise.all([
     fetch(`https://api.github.com/users/${username}`),
     fetch(`https://api.github.com/users/${username}/repos?per_page=100`),
@@ -85,11 +96,13 @@ export async function fetchGitHubStats(username: string): Promise<GitHubStats> {
   const longestStreak = computeStreak(days);
   const heatmap = buildHeatmap(days);
 
-  return {
+  const result: GitHubStats = {
     publicRepos: user.public_repos ?? 0,
     starsEarned,
     contributions,
     longestStreak,
     heatmap,
   };
+  _statsCache = { data: result, ts: Date.now() };
+  return result;
 }
