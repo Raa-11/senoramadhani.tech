@@ -103,23 +103,30 @@
         class="w-full pl-7.5 pr-3 py-1.5 bg-card border border-line-hi rounded-[7px] font-mono text-[11.5px] text-ink outline-none transition-colors duration-150 placeholder-muted focus:border-[color-mix(in_oklab,var(--accent)_55%,transparent)]"
       />
     </div>
-    <div class="flex gap-1.5">
-      {#each categories as cat}
-        <button
-          on:click={() => (selectedCategory = cat)}
-          class="inline-flex items-center gap-1 px-2.75 py-1.25 font-mono text-[10px] font-semibold uppercase tracking-[0.06em] rounded-[7px] border border-line-hi bg-card text-muted cursor-pointer transition-all duration-150 whitespace-nowrap {selectedCategory ===
-          cat
-            ? 'bg-accent text-accent-on border-accent'
-            : 'hover:text-ink'}"
-        >
-          {cat}
-          <span class="text-[9px] opacity-60"
-            >{cat === "All"
-              ? notes.length
-              : notes.filter((n) => n.data.category === cat).length}</span
-          >
-        </button>
-      {/each}
+    <div class="relative">
+      <select
+        bind:value={selectedCategory}
+        class="appearance-none pl-2.5 pr-7 py-1.5 font-mono text-[11px] font-semibold bg-card border border-line-hi rounded-[7px] text-ink cursor-pointer outline-none transition-colors duration-150 focus:border-[color-mix(in_oklab,var(--accent)_55%,transparent)]"
+      >
+        {#each categories as cat}
+          <option value={cat}>
+            {cat}
+          </option>
+        {/each}
+      </select>
+      <svg
+        width="10"
+        height="10"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+      >
+        <path d="m6 9 6 6 6-6" />
+      </svg>
     </div>
   </div>
 
@@ -183,6 +190,9 @@
           </div>
         </a>
       {/each}
+      {#if pagedNotes.length < PER_PAGE}
+        <div class="bg-card" style="grid-row: span {PER_PAGE - pagedNotes.length}"></div>
+      {/if}
     {/if}
   </div>
 

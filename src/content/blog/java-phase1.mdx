@@ -1,0 +1,1565 @@
+---
+title: "Java: Laying the Foundation"
+description: "A complete guide to the Java platform architecture, build tools, Java 25 new features, and core syntax — everything you need before writing your first real Java program."
+date: 2025-06-24
+tags: ["java", "java25", "jvm", "maven", "gradle", "programming"]
+category: "Java"
+---
+
+# Phase 1 — Java Platform & Environment
+
+## Introduction
+
+Let's start at the very beginning, and I mean the *real* beginning — not just "write this code and run it," but actually understanding what happens when you do. Most beginners skip this part and jump straight to writing code, which is fine for a while. But eventually they hit a wall. They get an error that mentions the "classpath" and have no idea what that means. They wonder why their program runs differently on a different machine. They hear words like "bytecode" or "JIT compiler" and feel lost.
+
+This phase is about removing that wall before it appears. By the time you finish it, you will understand not just how to write Java code, but how Java actually works — what the machine is doing when it compiles and runs your program. You will also know how to set up a real professional project using the same tools that companies use every day, and you will be familiar with the features that make Java 25 feel genuinely modern compared to older versions.
+
+There are four major areas in this phase. First, we dig into the JVM, JDK, and JRE — the architecture that powers everything. Second, we set up Maven and Gradle, the build tools every Java professional uses. Third, we walk through the most important new features in Java 25 specifically. And fourth, we cover the core syntax — the language fundamentals you need to write any Java program.
+
+Let us begin.
+
+---
+
+## Part 1 — JVM, JDK & JRE: How Java Actually Works
+
+### The problem Java was designed to solve
+
+Before Java existed, if you wrote a program in C or C++, you had to compile it separately for every operating system you wanted it to run on. A program compiled for Windows would not run on Linux. A program compiled for Mac would not run on Windows. You had to maintain separate codebases or at least separate build processes for every target platform.
+
+James Gosling and his team at Sun Microsystems in the early 1990s wanted to solve this. Their goal was to create a language where you write the code once, and it runs everywhere — on Windows, Linux, Mac, embedded devices, anything. The phrase they coined was "Write Once, Run Anywhere." They achieved this through a clever layer of abstraction called the Java Virtual Machine.
+
+### What the JVM is
+
+The Java Virtual Machine, or JVM, is a program that runs on your computer. Its job is to take Java programs and execute them. The key insight is that Java programs are not compiled directly into machine code that your CPU understands. Instead, they are compiled into an intermediate format called **bytecode**.
+
+Bytecode is not specific to any operating system or processor. It is a set of instructions designed specifically for the JVM to understand. Think of it like sheet music — the music itself is the same whether a pianist in Jakarta reads it or a pianist in London. The notes do not change. But each pianist plays it on their own piano, in their own room, using their own fingers. The JVM is the pianist. Bytecode is the sheet music. Your operating system and hardware are the room and the piano.
+
+When you run a Java program, the JVM reads the bytecode and translates it into actual machine instructions that your specific CPU and operating system understand, on the fly. This is why Java programs run everywhere — as long as there is a JVM available for a platform, Java programs can run on it.
+
+```
+Your Java code  (.java file)
+        ↓
+  Java compiler  (javac)
+        ↓
+    Bytecode  (.class file)
+        ↓
+  JVM reads bytecode
+        ↓
+  Translates to machine code
+        ↓
+  Your CPU executes it
+```
+
+### JIT compilation — why Java is fast
+
+You might be thinking: if the JVM has to translate bytecode to machine code every time, doesn't that make it slow? It would, if the JVM translated everything line by line and threw the result away each time. But modern JVMs are smarter than that. They use something called a JIT compiler — Just-In-Time compiler.
+
+The JIT compiler watches which parts of your program run frequently. When it notices that a particular method is being called thousands of times, it compiles that entire method down to native machine code and caches the result. The next time that method is called, the JVM does not interpret bytecode at all — it runs the pre-compiled native code directly, which is just as fast as a C program. This is why Java applications, once they warm up after startup, are extremely fast.
+
+### What the JRE is
+
+The Java Runtime Environment, or JRE, is the minimum package you need to *run* Java programs. It contains:
+
+- The JVM — the engine that executes bytecode
+- The Java Class Library — thousands of pre-built classes covering everything from string manipulation to networking to database connections
+- Supporting files and configuration
+
+If someone just wants to run a Java application on their computer without writing code themselves, the JRE is all they need.
+
+### What the JDK is
+
+The Java Development Kit, or JDK, is what you need when you want to *write* Java programs. It contains everything in the JRE, plus the development tools:
+
+- `javac` — the Java compiler that turns your `.java` source files into `.class` bytecode files
+- `java` — the launcher that starts the JVM and runs your program
+- `jar` — a tool for packaging your compiled code into a single distributable file
+- `javadoc` — generates HTML documentation from your code comments
+- `jshell` — an interactive Java shell for experimenting with code quickly
+- Debugging and profiling tools
+
+Think of it this way: JRE is to JDK what a car is to a garage with tools. The car gets you from A to B. The garage with tools lets you build and fix cars.
+
+```
+JDK
+ ├── JRE
+ │    ├── JVM
+ │    └── Java Class Library
+ ├── javac  (compiler)
+ ├── java   (launcher)
+ ├── jar    (packager)
+ ├── javadoc
+ └── jshell
+```
+
+### The JVM architecture in more detail
+
+Inside the JVM itself, several components work together every time your program runs:
+
+**Class Loader** — When your program starts, the class loader finds your `.class` bytecode files (and any libraries your program depends on) and loads them into memory. It does this on demand, loading a class only when it is first needed, not all at once at startup.
+
+**Runtime Data Areas** — The JVM organizes memory into several regions. The most important ones to know about are:
+
+- The **Heap** — where all objects you create with `new` live. When you write `new Mahasiswa("Budi", 20)`, the resulting object is stored here. The heap is shared across all threads.
+- The **Stack** — each thread gets its own stack. Every time you call a method, a new "frame" is pushed onto the stack containing that method's local variables and its place in the code. When the method returns, the frame is popped off.
+- The **Method Area** — stores the class definitions themselves — the bytecode, method signatures, and static fields.
+
+**Garbage Collector** — In languages like C and C++, you are responsible for manually freeing memory when you no longer need an object. Forget to do it, and your program leaks memory. Free it too early, and your program crashes. Java removes this burden entirely. The garbage collector runs in the background, periodically identifying objects that no program code can reach anymore, and freeing their memory automatically. You create objects freely and never worry about destroying them.
+
+Java 25 uses the G1 garbage collector by default, which is designed to minimize pauses — the brief moments when the GC needs to stop your program to do its cleanup work.
+
+### Installing JDK 25
+
+Now that you understand what you are installing and why, let us actually install it.
+
+Go to [adoptium.net](https://adoptium.net) — this is the home of Eclipse Temurin, the most widely used open-source JDK distribution. Alternatively, you can get the official Oracle build from [jdk.java.net/25](https://jdk.java.net/25). Download the JDK 25 installer for your operating system and run it.
+
+After installation, open your terminal and verify everything worked:
+
+```bash
+java -version
+# Expected output: openjdk version "25" 2025-09-16
+# OpenJDK Runtime Environment Temurin-25+...
+
+javac -version
+# Expected output: javac 25
+```
+
+If you see those version numbers, your JDK is installed and your PATH is configured correctly. If you get "command not found," you need to add the JDK's `bin` directory to your system PATH — the installer should do this automatically, but occasionally it does not on certain systems.
+
+### Installing IntelliJ IDEA
+
+You could write Java in any text editor, but a professional IDE makes everything easier. IntelliJ IDEA understands Java deeply — it catches errors before you run your code, auto-completes intelligently, lets you navigate large codebases efficiently, and integrates with all the tools you will use.
+
+Go to [jetbrains.com/idea](https://www.jetbrains.com/idea/) and download the **Community Edition**, which is free and contains everything you need for learning and most professional work. Install it, open it, and when it asks you to create a project, select New Project → Java → JDK 25.
+
+---
+
+## Part 2 — Maven & Gradle: Managing Real Projects
+
+### Why build tools exist
+
+When your program is just one file, you can compile it with `javac HelloWorld.java` and run it with `java HelloWorld`. But real applications are never one file. A professional Java application might have hundreds or thousands of source files, organized into packages and modules. It will depend on dozens of external libraries — open-source tools that other people wrote that you want to use without reinventing them yourself. It needs to be compiled in the right order, tested, packaged into a distributable JAR file, and possibly deployed to a server.
+
+Doing all of this manually with command-line tools would be a nightmare. This is what build tools are for. They automate the entire process — dependency management, compilation, testing, packaging, deployment — through a single configuration file. You describe what your project is and what it depends on, and the build tool figures out how to build it.
+
+The two dominant build tools in the Java world are Maven and Gradle. You will encounter both in your career. Quarkus, the framework you are working toward, supports both, but uses Maven as its default.
+
+### Maven
+
+Maven was created in 2002 and is the older of the two tools. It is extremely widely used, especially in enterprise environments. Maven's philosophy is convention over configuration — it defines a standard project structure that everyone follows, so any Java developer can look at a Maven project and immediately know where everything is.
+
+#### The standard Maven project structure
+
+```
+my-project/
+├── pom.xml                    ← the entire project configuration lives here
+├── src/
+│   ├── main/
+│   │   ├── java/              ← your application source code goes here
+│   │   │   └── com/example/
+│   │   │       └── App.java
+│   │   └── resources/         ← config files, templates, etc.
+│   │       └── application.properties
+│   └── test/
+│       ├── java/              ← your test code goes here
+│       │   └── com/example/
+│       │       └── AppTest.java
+│       └── resources/
+└── target/                    ← Maven puts compiled output here (auto-generated)
+```
+
+This structure is fixed. You do not configure it — you just follow it. Every Maven project in every company looks like this. That consistency is one of Maven's biggest advantages.
+
+#### The pom.xml file
+
+POM stands for Project Object Model. This XML file is the heart of every Maven project. It describes everything about your project: its name, version, what Java version it targets, and most importantly, what external libraries it depends on.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Who you are -->
+    <groupId>com.yourname</groupId>       <!-- your organization, reverse domain style -->
+    <artifactId>my-first-project</artifactId>  <!-- your project name -->
+    <version>1.0.0</version>              <!-- your project version -->
+    <packaging>jar</packaging>            <!-- output format -->
+
+    <!-- What Java version to use -->
+    <properties>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <!-- External libraries your project needs -->
+    <dependencies>
+
+        <!-- Example: Google's Gson library for working with JSON -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
+        <!-- Example: JUnit 5 for writing tests -->
+        <!-- scope=test means this library is only used during testing, not in production -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>
+```
+
+When you declare a dependency in `pom.xml`, Maven automatically downloads that library from the internet (from a central repository called Maven Central) and makes it available to your code. It also downloads any libraries that *those* libraries depend on, and so on recursively. You never manually download JAR files and add them to your project.
+
+#### The most important Maven commands
+
+```bash
+# Compile your source code
+mvn compile
+
+# Run all your tests
+mvn test
+
+# Package your project into a JAR file (also runs tests)
+mvn package
+
+# Clean the target/ directory (delete all compiled output)
+mvn clean
+
+# Most common combination: clean everything then package fresh
+mvn clean package
+
+# Install your project into your local Maven cache
+# (so other local projects can depend on it)
+mvn install
+```
+
+#### Maven lifecycle — how builds actually work
+
+Maven defines a concept called the build lifecycle. When you run `mvn package`, Maven does not just package your code — it runs a series of phases in order: validate → compile → test → package. Each phase does exactly what its name says. If any phase fails, the build stops there. This ensures you never ship code that does not compile or that fails its tests.
+
+### Gradle
+
+Gradle was created in 2007 as a more flexible and faster alternative to Maven. Where Maven uses XML configuration, Gradle uses actual code — either Groovy or Kotlin — for its build scripts. This means you can write real logic in your build configuration, which is powerful when you have complex build requirements.
+
+Gradle is the default build tool for Android development and is increasingly popular for server-side Java as well.
+
+#### The standard Gradle project structure
+
+```
+my-project/
+├── build.gradle.kts           ← Kotlin DSL build script (modern approach)
+├── settings.gradle.kts        ← project name and multi-project settings
+├── gradlew                    ← Gradle wrapper script (Mac/Linux)
+├── gradlew.bat                ← Gradle wrapper script (Windows)
+├── gradle/
+│   └── wrapper/
+│       └── gradle-wrapper.properties
+└── src/
+    ├── main/
+    │   ├── java/              ← same structure as Maven
+    │   └── resources/
+    └── test/
+        ├── java/
+        └── resources/
+```
+
+#### The build.gradle.kts file
+
+```kotlin
+plugins {
+    java                        // apply the Java plugin
+    application                 // apply the application plugin (adds run task)
+}
+
+group = "com.yourname"
+version = "1.0.0"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+    mavenCentral()              // download dependencies from Maven Central
+}
+
+dependencies {
+    // External library
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // Testing libraries
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+application {
+    mainClass = "com.yourname.App"   // the class with your main method
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+```
+
+#### The most important Gradle commands
+
+```bash
+# Compile your source code
+./gradlew compileJava
+
+# Run all your tests
+./gradlew test
+
+# Build everything (compile, test, package)
+./gradlew build
+
+# Clean build output
+./gradlew clean
+
+# Run your application directly
+./gradlew run
+
+# Clean and rebuild
+./gradlew clean build
+```
+
+Notice you use `./gradlew` (with the dot-slash) instead of just `gradle`. This runs the Gradle Wrapper — a small script included in your project that downloads and uses the exact version of Gradle your project was built with, ensuring everyone on the team uses the same version regardless of what they have installed globally.
+
+### Maven vs Gradle — which should you use?
+
+For learning and for Quarkus projects, use **Maven**. Quarkus's project generator defaults to Maven, most Quarkus documentation examples use Maven, and Maven's verbose XML is actually helpful when you are learning because every declaration is explicit and readable.
+
+Once you are comfortable with Maven, Gradle is easy to pick up and worth knowing since you will encounter it frequently, especially if you ever do Android development.
+
+---
+
+## Part 3 — Java 25 New Features
+
+### Why Java 25 specifically matters
+
+Java releases a new version every six months. Most of these releases are intermediate versions — they introduce features in preview mode, gather feedback, and refine them. Every few years, one release is designated as LTS — Long-Term Support — meaning it will receive security patches and bug fixes for many years. Companies adopt LTS versions because they need stability.
+
+Java 25 is an LTS release. This means it is the version companies will standardize on for the next several years, and it is where all the features that were previewed and refined over the past few releases have arrived in their final, stable form.
+
+### Feature 1 — Unnamed main methods
+
+This is the one you already know from the earlier sessions, but let us understand the full story behind it.
+
+For 30 years, every Java program required this boilerplate to even print "Hello World":
+
+```java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello World");
+    }
+}
+```
+
+Each keyword here has a meaning: `public` means the method is accessible from anywhere, `static` means it belongs to the class not an instance, `void` means it returns nothing, `String[] args` holds command-line arguments. These are all valid and important concepts, but for a beginner whose first goal is simply to display some output, they are noise. You need to understand six concepts just to see the program start.
+
+Java 25 stabilizes unnamed main methods (JEP 463), allowing this:
+
+```java
+void main() {
+    System.out.println("Hello World");
+}
+```
+
+The old form still works perfectly. Nothing is removed. But now beginners can focus on learning one concept at a time without fighting ceremony. As you grow into professional Java development, you naturally transition back to the full class structure — but by then you understand what each part means.
+
+### Feature 2 — Records
+
+Records were introduced as a preview in Java 14 and became stable in Java 16. By Java 25, they are mature and widely used.
+
+A record is a special kind of class designed purely to hold immutable data. Before records, if you wanted a simple class to carry a few values from one place to another, you had to write substantial boilerplate:
+
+```java
+// The old way — before records
+public final class Point {
+    private final int x;
+    private final int y;
+
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int x() { return x; }
+    public int y() { return y; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Point)) return false;
+        Point p = (Point) o;
+        return x == p.x && y == p.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
+
+    @Override
+    public String toString() {
+        return "Point[x=" + x + ", y=" + y + "]";
+    }
+}
+```
+
+That is 25 lines of code for a class that just holds two integers. With records:
+
+```java
+// The new way — records
+public record Point(int x, int y) {}
+```
+
+One line. That single declaration automatically provides a constructor, getters (called `x()` and `y()` rather than `getX()` and `getY()`), a properly implemented `equals()`, `hashCode()`, and a readable `toString()`. The fields are automatically `final` — records are immutable by design.
+
+```java
+void main() {
+    Point p1 = new Point(3, 7);
+    Point p2 = new Point(3, 7);
+
+    System.out.println(p1.x());          // 3
+    System.out.println(p1.y());          // 7
+    System.out.println(p1);              // Point[x=3, y=7]
+    System.out.println(p1.equals(p2));   // true — compares by value, not reference
+}
+```
+
+Records can also have custom validation in what is called a compact constructor:
+
+```java
+public record Temperature(double celsius) {
+    // Compact constructor — runs before the record assigns the field
+    public Temperature {
+        if (celsius < -273.15) {
+            throw new IllegalArgumentException(
+                "Temperature cannot go below absolute zero"
+            );
+        }
+    }
+
+    // Custom methods are allowed
+    public double toFahrenheit() {
+        return celsius * 9.0 / 5.0 + 32;
+    }
+
+    public double toKelvin() {
+        return celsius + 273.15;
+    }
+}
+```
+
+```java
+void main() {
+    Temperature t = new Temperature(100);
+    System.out.println(t.celsius());      // 100.0
+    System.out.println(t.toFahrenheit()); // 212.0
+    System.out.println(t.toKelvin());     // 373.15
+
+    // This throws an exception
+    Temperature invalid = new Temperature(-500); // IllegalArgumentException
+}
+```
+
+### Feature 3 — Pattern matching
+
+Pattern matching is a collection of features that make working with types cleaner and more expressive. It eliminates a lot of the defensive casting and null-checking that used to clutter Java code.
+
+#### Pattern matching for instanceof
+
+Before Java 16, if you wanted to check whether an object was a certain type and then use it as that type, you had to do it in two steps:
+
+```java
+// Old way
+Object obj = "Hello World";
+
+if (obj instanceof String) {
+    String s = (String) obj;   // redundant cast
+    System.out.println(s.toUpperCase());
+}
+```
+
+You explicitly checked the type, then immediately cast to that type. The compiler already knows it is a String after the `instanceof` check — why make you cast it again? With pattern matching for `instanceof`:
+
+```java
+// New way — Java 16+, stable in Java 25
+Object obj = "Hello World";
+
+if (obj instanceof String s) {
+    // s is already typed as String here — no cast needed
+    System.out.println(s.toUpperCase()); // HELLO WORLD
+}
+```
+
+The variable `s` is introduced right in the `instanceof` expression and is available throughout the `if` block, already typed correctly.
+
+#### Pattern matching for switch
+
+Switch expressions with pattern matching take this further, letting you match against types in a switch:
+
+```java
+sealed interface Shape permits Circle, Rectangle, Triangle {}
+record Circle(double radius) implements Shape {}
+record Rectangle(double width, double height) implements Shape {}
+record Triangle(double base, double height) implements Shape {}
+
+static double area(Shape shape) {
+    return switch (shape) {
+        case Circle c    -> Math.PI * c.radius() * c.radius();
+        case Rectangle r -> r.width() * r.height();
+        case Triangle t  -> 0.5 * t.base() * t.height();
+    };
+    // No default needed — compiler knows all cases are covered
+    // because Shape is sealed
+}
+
+void main() {
+    Shape[] shapes = {
+        new Circle(5),
+        new Rectangle(4, 6),
+        new Triangle(3, 8)
+    };
+
+    for (Shape s : shapes) {
+        System.out.printf("Area: %.2f%n", area(s));
+    }
+    // Area: 78.54
+    // Area: 24.00
+    // Area: 12.00
+}
+```
+
+### Feature 4 — Sealed classes
+
+Sealed classes let you control which classes are allowed to extend or implement a type. This is especially powerful when combined with pattern matching — the compiler can verify that your switch expression handles all possible subtypes.
+
+```java
+// Only these three classes are permitted to implement Payment
+public sealed interface Payment permits CashPayment, CardPayment, QRPayment {}
+
+public record CashPayment(double amount) implements Payment {}
+public record CardPayment(String cardNumber, double amount) implements Payment {}
+public record QRPayment(String merchantId, double amount) implements Payment {}
+
+static String describe(Payment payment) {
+    return switch (payment) {
+        case CashPayment c  -> "Cash payment of Rp" + c.amount();
+        case CardPayment c  -> "Card ending in " +
+                               c.cardNumber().substring(c.cardNumber().length() - 4) +
+                               ", amount Rp" + c.amount();
+        case QRPayment q    -> "QR payment to merchant " + q.merchantId() +
+                               ", amount Rp" + q.amount();
+        // No default needed — sealed ensures exhaustive matching
+    };
+}
+```
+
+### Feature 5 — Text blocks
+
+Text blocks make it easy to write multi-line string literals without concatenating dozens of strings or scattering `\n` everywhere:
+
+```java
+void main() {
+    // Before text blocks — painful
+    String jsonOld = "{\n" +
+                     "  \"name\": \"Budi\",\n" +
+                     "  \"age\": 20\n" +
+                     "}";
+
+    // With text blocks — clean and readable
+    String json = """
+            {
+              "name": "Budi",
+              "age": 20
+            }
+            """;
+
+    String html = """
+            <html>
+              <body>
+                <h1>Hello, World!</h1>
+              </body>
+            </html>
+            """;
+
+    String sql = """
+            SELECT u.name, u.email, o.total
+            FROM users u
+            JOIN orders o ON u.id = o.user_id
+            WHERE o.status = 'PAID'
+            ORDER BY o.created_at DESC
+            """;
+
+    System.out.println(json);
+}
+```
+
+### Feature 6 — Virtual threads (Project Loom)
+
+This is one of the most significant Java 25 features for server-side development, and we will cover it in depth in Phase 5. For now, a brief introduction.
+
+Traditional Java threads map directly to operating system threads. Creating a thread is expensive — each one consumes significant memory (typically around 1MB of stack space). A server handling 10,000 concurrent requests needs 10,000 threads, which means 10GB of memory just for thread stacks, before your application even does anything useful.
+
+Virtual threads are lightweight threads managed by the JVM rather than the OS. They are cheap to create — you can create millions of them. They share a small pool of real OS threads underneath, with the JVM handling the scheduling.
+
+```java
+// Creating a traditional OS thread — expensive
+Thread traditional = new Thread(() -> {
+    System.out.println("Traditional thread");
+});
+traditional.start();
+
+// Creating a virtual thread — extremely cheap
+Thread virtual = Thread.ofVirtual().start(() -> {
+    System.out.println("Virtual thread");
+});
+
+// Creating a million virtual threads is practical
+for (int i = 0; i < 1_000_000; i++) {
+    Thread.ofVirtual().start(() -> {
+        // Each of these costs almost nothing to create
+        doSomeWork();
+    });
+}
+```
+
+For Quarkus microservices — which you are building toward — virtual threads are transformative. They let your services handle dramatically more concurrent requests with the same hardware.
+
+---
+
+## Part 4 — Core Java Syntax
+
+### Your first program revisited
+
+Now that you understand what happens under the hood, let us look at the Hello World program again with fresh eyes:
+
+```java
+// Java 25 — simple form, no class needed for small programs
+void main() {
+    System.out.println("Hello, Java 25!");
+}
+```
+
+When you run this, IntelliJ calls `javac` to compile your `.java` file into a `.class` bytecode file. Then it calls `java` to start the JVM, which loads the class, finds the `main` method, and begins executing it. `System.out` is an object representing the standard output stream — your terminal. `println` is a method on that object that writes a line of text and adds a newline at the end.
+
+### Variables and data types
+
+A variable is a named container for a value. Before you use a variable in Java, you must declare its type. Java needs to know what kind of data the container will hold so it can allocate the right amount of memory and protect you from putting the wrong kind of data in.
+
+#### The eight primitive types
+
+These are the building blocks — simple values stored directly in memory, not objects:
+
+```java
+void main() {
+    // Integer types — for whole numbers, no decimal point
+    byte   a = 100;              // 8-bit,  range: -128 to 127
+    short  b = 30_000;           // 16-bit, range: -32,768 to 32,767
+    int    c = 2_000_000;        // 32-bit, range: about -2 billion to 2 billion
+                                 // This is the one you use for almost all integers
+    long   d = 9_000_000_000L;   // 64-bit, for very large numbers
+                                 // The L suffix is required — without it Java
+                                 // tries to interpret the number as int and overflows
+
+    // Floating-point types — for numbers with decimal points
+    float  e = 3.14f;            // 32-bit, less precise — f suffix required
+    double f = 3.14159265358979; // 64-bit, more precise — this is the default
+
+    // Character type — a single Unicode character
+    char   g = 'A';              // Always single quotes, not double
+    char   h = '\u0041';         // Unicode escape — also 'A'
+
+    // Boolean type — logical true or false
+    boolean i = true;
+    boolean j = false;
+}
+```
+
+A practical rule of thumb: use `int` for integers unless the number exceeds about 2 billion (then use `long`). Use `double` for decimals. Use `boolean` for true/false logic. `char` is used less often as Java's String handles most text needs.
+
+#### The String type
+
+String is not a primitive — it is a class, meaning String values are objects with methods. But it is so fundamental that it has special syntax:
+
+```java
+void main() {
+    String name = "Budi Santoso";     // double quotes always
+    String empty = "";                 // empty string
+    String nullStr = null;             // no string at all — careful with this
+
+    // Strings are immutable — once created, they cannot be changed.
+    // Operations that seem to modify a string actually create a new one.
+    String upper = name.toUpperCase(); // creates a new String "BUDI SANTOSO"
+    // name itself is still "Budi Santoso"
+}
+```
+
+#### Type inference with var
+
+Since Java 10, you can let the compiler infer the type from the value you assign, using `var`:
+
+```java
+void main() {
+    var count = 0;           // compiler infers: int
+    var price = 9.99;        // compiler infers: double
+    var message = "Hello";   // compiler infers: String
+    var active = true;       // compiler infers: boolean
+
+    // var is NOT dynamic typing — the type is fixed at compile time
+    // This would be a compile error:
+    // count = "not a number";  // ERROR: count is int, not String
+}
+```
+
+`var` reduces verbosity without sacrificing type safety. Use it when the type is obvious from the right side of the assignment.
+
+#### Type conversion
+
+Sometimes you need to convert between types:
+
+```java
+void main() {
+    // Widening — smaller type fits inside larger type, automatic
+    int    x = 100;
+    long   y = x;      // int → long, safe, no data loss
+    double z = x;      // int → double, safe, becomes 100.0
+
+    // Narrowing — larger type forced into smaller type, requires explicit cast
+    double pi = 3.14159;
+    int truncated = (int) pi;   // cast explicitly — decimal part is dropped
+    System.out.println(truncated); // 3
+
+    // String ↔ number conversions
+    String s = "42";
+    int    n = Integer.parseInt(s);      // String to int
+    double d = Double.parseDouble("3.14"); // String to double
+
+    String fromInt    = String.valueOf(42);   // int to String → "42"
+    String fromDouble = String.valueOf(3.14); // double to String → "3.14"
+    String quick      = "" + 42;             // quick but less readable
+}
+```
+
+### Operators
+
+#### Arithmetic operators
+
+```java
+void main() {
+    int a = 17, b = 5;
+
+    System.out.println(a + b);  // 22 — addition
+    System.out.println(a - b);  // 12 — subtraction
+    System.out.println(a * b);  // 85 — multiplication
+    System.out.println(a / b);  // 3  — integer division: remainder is discarded
+    System.out.println(a % b);  // 2  — modulo: the remainder (17 = 3×5 + 2)
+
+    // Integer division surprises beginners often
+    System.out.println(7 / 2);          // 3, not 3.5
+    System.out.println(7.0 / 2);        // 3.5 — one double makes the result double
+    System.out.println((double) 7 / 2); // 3.5 — cast one operand to double
+}
+```
+
+The modulo operator `%` deserves special attention. It gives you the remainder after division. Its most common use is checking whether a number is even or odd: `n % 2 == 0` means n is even. It also appears whenever you need to wrap around — for example, cycling through an array endlessly: `index % array.length` keeps the index within bounds no matter how large it gets.
+
+#### Increment and decrement
+
+```java
+void main() {
+    int x = 5;
+
+    // Post-increment: read the value, then increment
+    int a = x++;    // a = 5, then x becomes 6
+    System.out.println(a); // 5
+    System.out.println(x); // 6
+
+    // Pre-increment: increment first, then read the value
+    int b = ++x;    // x becomes 7, then b = 7
+    System.out.println(b); // 7
+    System.out.println(x); // 7
+
+    // Same logic applies to decrement (--)
+    x--;   // x = 6
+    --x;   // x = 5
+}
+```
+
+#### Compound assignment
+
+These combine an operation with assignment and are preferred for clarity:
+
+```java
+void main() {
+    int score = 100;
+
+    score += 50;   // score = score + 50  → 150
+    score -= 30;   // score = score - 30  → 120
+    score *= 2;    // score = score * 2   → 240
+    score /= 3;    // score = score / 3   → 80
+    score %= 7;    // score = score % 7   → 3
+
+    System.out.println(score); // 3
+}
+```
+
+#### Comparison operators — always return boolean
+
+```java
+void main() {
+    int a = 10, b = 5;
+
+    boolean eq  = (a == b);  // false — equal to
+    boolean neq = (a != b);  // true  — not equal to
+    boolean gt  = (a > b);   // true  — greater than
+    boolean lt  = (a < b);   // false — less than
+    boolean gte = (a >= b);  // true  — greater than or equal to
+    boolean lte = (a <= b);  // false — less than or equal to
+}
+```
+
+#### Logical operators
+
+```java
+void main() {
+    boolean hungry = true;
+    boolean hasMoney = false;
+
+    // AND — both must be true
+    System.out.println(hungry && hasMoney);  // false — need both
+
+    // OR — at least one must be true
+    System.out.println(hungry || hasMoney);  // true — at least hungry
+
+    // NOT — inverts the value
+    System.out.println(!hungry);             // false
+
+    // Short-circuit evaluation — Java stops early when possible
+    // If the first operand of && is false, the second is never evaluated
+    // If the first operand of || is true, the second is never evaluated
+    int x = 0;
+    boolean result = (x != 0) && (10 / x > 1); // safe — division never happens
+    System.out.println(result); // false
+}
+```
+
+#### The ternary operator
+
+A compact way to express an if/else that produces a value:
+
+```java
+void main() {
+    int age = 20;
+
+    // condition ? value_if_true : value_if_false
+    String status = (age >= 18) ? "Adult" : "Minor";
+    System.out.println(status); // Adult
+
+    int score = 75;
+    String grade = score >= 90 ? "A" :
+                   score >= 80 ? "B" :
+                   score >= 70 ? "C" :
+                   score >= 60 ? "D" : "E";
+    System.out.println(grade); // C
+}
+```
+
+### Strings in depth
+
+Strings deserve extra attention because they behave differently from primitive types in several important ways.
+
+#### String methods
+
+```java
+void main() {
+    String s = "  Hello, World!  ";
+
+    // Length and case
+    System.out.println(s.length());           // 17 (including spaces)
+    System.out.println(s.trim());             // "Hello, World!" (spaces removed)
+    System.out.println(s.strip());            // "Hello, World!" (modern, Unicode-aware)
+    System.out.println(s.toUpperCase());      // "  HELLO, WORLD!  "
+    System.out.println(s.toLowerCase());      // "  hello, world!  "
+
+    // Searching
+    String clean = s.trim();
+    System.out.println(clean.indexOf("World"));    // 7 — first occurrence position
+    System.out.println(clean.contains("World"));   // true
+    System.out.println(clean.startsWith("Hello")); // true
+    System.out.println(clean.endsWith("!"));       // true
+
+    // Extracting
+    System.out.println(clean.substring(7));        // "World!" — from index 7 to end
+    System.out.println(clean.substring(7, 12));    // "World" — index 7 up to (not including) 12
+    System.out.println(clean.charAt(0));           // 'H' — character at position 0
+
+    // Modifying (creates new String — originals unchanged)
+    System.out.println(clean.replace("World", "Java")); // "Hello, Java!"
+    System.out.println(clean.replaceAll("\\s+", "-"));  // "Hello,-World!" (regex)
+
+    // Splitting
+    String csv = "apel,mangga,jeruk,durian";
+    String[] fruits = csv.split(",");
+    System.out.println(fruits[0]); // apel
+    System.out.println(fruits.length); // 4
+
+    // Joining — the opposite of splitting
+    String joined = String.join(" | ", fruits);
+    System.out.println(joined); // apel | mangga | jeruk | durian
+
+    // Checking emptiness
+    System.out.println("".isEmpty());     // true — length is 0
+    System.out.println("  ".isBlank());   // true — only whitespace
+    System.out.println("hi".isEmpty());   // false
+}
+```
+
+#### The critical rule: never use == to compare Strings
+
+This is one of the most common bugs Java beginners write, and it comes down to understanding how objects work in memory.
+
+When you write `int a = 5` and `int b = 5`, Java stores two actual 5 values in memory. When you compare `a == b`, it compares the values — both are 5, so the result is `true`.
+
+When you write `String a = "Hello"`, Java does not store the letters H-e-l-l-o directly in the variable. It stores a reference — a memory address pointing to the actual String object somewhere in the heap. When you compare `a == b` with Strings, you are comparing memory addresses, not the actual text. Two String variables might contain identical text but point to different objects in memory, making `==` return `false` even though the strings look the same.
+
+```java
+void main() {
+    // These two might point to the same object (String pool optimization)
+    // or different objects — behavior is undefined and unreliable
+    String a = "Hello";
+    String b = "Hello";
+    System.out.println(a == b);         // might be true, might not — unreliable
+
+    // This definitely creates two separate objects
+    String c = new String("Hello");
+    String d = new String("Hello");
+    System.out.println(c == d);         // false — different objects in memory
+
+    // ALWAYS use equals() to compare String content
+    System.out.println(a.equals(b));    // true — compares actual text
+    System.out.println(c.equals(d));    // true — compares actual text
+    System.out.println(a.equalsIgnoreCase("HELLO")); // true — case-insensitive
+}
+```
+
+The rule is simple: use `==` for primitives (`int`, `double`, `boolean`, etc.) and always use `.equals()` for objects including Strings.
+
+#### StringBuilder — when you need to build strings efficiently
+
+Because Strings are immutable, concatenating many strings with `+` is inefficient — each `+` creates a new String object and discards the old one. When you are building a string in a loop or from many parts, use `StringBuilder`:
+
+```java
+void main() {
+    // Inefficient — creates many temporary String objects
+    String result = "";
+    for (int i = 0; i < 10; i++) {
+        result += i + ", ";   // each iteration creates a new String
+    }
+
+    // Efficient — modifies one buffer in place
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < 10; i++) {
+        sb.append(i);
+        if (i < 9) sb.append(", ");
+    }
+    String efficient = sb.toString();
+    System.out.println(efficient); // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+}
+```
+
+### Control flow — making decisions
+
+#### if, else if, else
+
+```java
+void main() {
+    int score = 82;
+
+    if (score >= 90) {
+        System.out.println("Grade A — Excellent");
+    } else if (score >= 80) {
+        System.out.println("Grade B — Good");        // this runs
+    } else if (score >= 70) {
+        System.out.println("Grade C — Average");
+    } else if (score >= 60) {
+        System.out.println("Grade D — Below average");
+    } else {
+        System.out.println("Grade E — Failed");
+    }
+
+    // Guard clauses — prefer early returns over deep nesting
+    // Instead of nesting if inside if inside if, return early for the invalid cases
+    // This pattern will become important when writing methods
+}
+```
+
+#### switch statement — classic form
+
+```java
+void main() {
+    int day = 3;
+
+    switch (day) {
+        case 1:
+            System.out.println("Monday");
+            break;      // without break, execution falls through to next case
+        case 2:
+            System.out.println("Tuesday");
+            break;
+        case 3:
+            System.out.println("Wednesday");  // this runs
+            break;
+        case 4:
+            System.out.println("Thursday");
+            break;
+        case 5:
+            System.out.println("Friday");
+            break;
+        case 6:
+        case 7:
+            System.out.println("Weekend");    // cases 6 and 7 share this
+            break;
+        default:
+            System.out.println("Invalid day");
+    }
+}
+```
+
+#### switch expression — modern Java 25 form
+
+```java
+void main() {
+    int day = 3;
+
+    // Switch expression returns a value
+    // Arrow syntax → means "produce this value"
+    // No break needed — no fallthrough
+    String dayName = switch (day) {
+        case 1 -> "Monday";
+        case 2 -> "Tuesday";
+        case 3 -> "Wednesday";    // matched
+        case 4 -> "Thursday";
+        case 5 -> "Friday";
+        case 6, 7 -> "Weekend";   // multiple values in one case
+        default -> "Invalid day";
+    };
+
+    System.out.println(dayName); // Wednesday
+
+    // For multi-line cases, use yield to produce the value
+    String description = switch (day) {
+        case 1, 2, 3, 4, 5 -> {
+            String type = "Weekday";
+            yield type + ": day " + day;  // yield instead of return
+        }
+        case 6, 7 -> "Weekend";
+        default -> "Unknown";
+    };
+}
+```
+
+### Loops — repeating work
+
+#### The for loop
+
+```java
+void main() {
+    // Basic counting loop
+    for (int i = 0; i < 5; i++) {
+        System.out.println("Count: " + i);
+    }
+    // Prints: 0, 1, 2, 3, 4
+
+    // Counting down
+    for (int i = 10; i >= 1; i--) {
+        System.out.print(i + " ");
+    }
+    System.out.println();
+    // Prints: 10 9 8 7 6 5 4 3 2 1
+
+    // Stepping by a value other than 1
+    for (int i = 0; i <= 100; i += 10) {
+        System.out.print(i + " ");
+    }
+    System.out.println();
+    // Prints: 0 10 20 30 40 50 60 70 80 90 100
+
+    // Iterating over an array with index
+    int[] numbers = {10, 20, 30, 40, 50};
+    for (int i = 0; i < numbers.length; i++) {
+        System.out.println("numbers[" + i + "] = " + numbers[i]);
+    }
+}
+```
+
+#### The enhanced for loop (for-each)
+
+```java
+void main() {
+    // When you do not need the index, for-each is cleaner
+    int[] numbers = {10, 20, 30, 40, 50};
+
+    for (int n : numbers) {
+        System.out.println(n);
+    }
+
+    String[] names = {"Budi", "Sari", "Agus", "Dewi"};
+    for (String name : names) {
+        System.out.println("Hello, " + name + "!");
+    }
+}
+```
+
+#### The while loop
+
+```java
+void main() {
+    // Use while when you do not know the number of iterations in advance
+    int n = 1;
+    while (n <= 100) {
+        if (n % 15 == 0) {
+            System.out.println("FizzBuzz");
+        } else if (n % 3 == 0) {
+            System.out.println("Fizz");
+        } else if (n % 5 == 0) {
+            System.out.println("Buzz");
+        } else {
+            System.out.println(n);
+        }
+        n++;
+    }
+}
+```
+
+#### The do-while loop
+
+```java
+void main() {
+    // do-while always executes the body at least once
+    // before checking the condition
+    int x = 100;
+
+    do {
+        System.out.println("This runs at least once: x = " + x);
+        x++;
+    } while (x < 5);
+    // Condition was false from the start, but body ran once anyway
+    // Output: This runs at least once: x = 100
+}
+```
+
+#### Controlling loops with break and continue
+
+```java
+void main() {
+    // break — exit the loop immediately
+    for (int i = 0; i < 20; i++) {
+        if (i == 7) {
+            System.out.println("Found 7, stopping.");
+            break;
+        }
+        System.out.print(i + " ");
+    }
+    // Output: 0 1 2 3 4 5 6 Found 7, stopping.
+
+    System.out.println();
+
+    // continue — skip the rest of this iteration, move to next
+    for (int i = 0; i < 15; i++) {
+        if (i % 3 == 0) continue;   // skip multiples of 3
+        System.out.print(i + " ");
+    }
+    // Output: 1 2 4 5 7 8 10 11 13 14
+}
+```
+
+### Arrays
+
+An array is a fixed-size, ordered collection of elements all of the same type. Fixed-size means once you create an array with 10 slots, it always has exactly 10 slots — you cannot add or remove slots. If you need a resizable collection, you will use ArrayList, which we cover in Phase 4.
+
+```java
+void main() {
+    // Declare and initialize with values
+    int[] primes = {2, 3, 5, 7, 11, 13};
+
+    // Declare and allocate without values (filled with default: 0 for int)
+    int[] scores = new int[5];
+    scores[0] = 85;
+    scores[1] = 92;
+    scores[2] = 78;
+    // scores[3] and scores[4] remain 0
+
+    // Access by index — zero-based
+    System.out.println(primes[0]);          // 2 — first element
+    System.out.println(primes[5]);          // 13 — last element
+    System.out.println(primes.length);      // 6 — total elements
+
+    // Common mistake: index out of bounds
+    // System.out.println(primes[6]);       // ArrayIndexOutOfBoundsException!
+    // Valid indices are 0 through length-1
+
+    // Iterating
+    for (int i = 0; i < primes.length; i++) {
+        System.out.printf("primes[%d] = %d%n", i, primes[i]);
+    }
+
+    // For-each when index is not needed
+    for (int prime : primes) {
+        System.out.print(prime + " ");
+    }
+}
+```
+
+#### Two-dimensional arrays
+
+```java
+void main() {
+    // A 3x4 grid — 3 rows, 4 columns
+    int[][] grid = new int[3][4];
+
+    // Fill with values
+    for (int row = 0; row < grid.length; row++) {
+        for (int col = 0; col < grid[row].length; col++) {
+            grid[row][col] = row * 4 + col + 1;
+        }
+    }
+
+    // Print the grid
+    for (int[] row : grid) {
+        for (int val : row) {
+            System.out.printf("%4d", val);
+        }
+        System.out.println();
+    }
+    //    1   2   3   4
+    //    5   6   7   8
+    //    9  10  11  12
+
+    // Initialize directly
+    int[][] matrix = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}
+    };
+
+    System.out.println(matrix[1][2]); // 6 — row 1, column 2
+}
+```
+
+### Methods
+
+A method is a named, reusable block of code. Every meaningful Java program is organized into methods. When you find yourself writing the same logic in multiple places, that is a strong signal it should be a method.
+
+```java
+// Method structure:
+// [modifiers] returnType methodName(parameterList) { body }
+
+static void greet(String name) {
+    System.out.println("Hello, " + name + "!");
+}
+
+static int add(int a, int b) {
+    return a + b;
+}
+
+static double average(double[] numbers) {
+    double sum = 0;
+    for (double n : numbers) sum += n;
+    return sum / numbers.length;
+}
+
+static boolean isPrime(int n) {
+    if (n < 2) return false;
+    for (int i = 2; i <= Math.sqrt(n); i++) {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+void main() {
+    greet("Budi");                                // Hello, Budi!
+    System.out.println(add(5, 3));                // 8
+    System.out.println(average(new double[]{85, 92, 78, 90})); // 86.25
+    System.out.println(isPrime(17));              // true
+    System.out.println(isPrime(15));              // false
+}
+```
+
+#### Method overloading
+
+Multiple methods with the same name can coexist as long as their parameter lists differ. Java determines which one to call based on the arguments you pass:
+
+```java
+static void print(int n) {
+    System.out.println("Integer: " + n);
+}
+
+static void print(double d) {
+    System.out.println("Double: " + d);
+}
+
+static void print(String s) {
+    System.out.println("String: " + s);
+}
+
+static void print(int a, int b) {
+    System.out.println("Two ints: " + a + " and " + b);
+}
+
+void main() {
+    print(42);          // Integer: 42
+    print(3.14);        // Double: 3.14
+    print("Hello");     // String: Hello
+    print(1, 2);        // Two ints: 1 and 2
+}
+```
+
+#### Varargs
+
+When you do not know how many arguments a caller will pass:
+
+```java
+static double sum(double... numbers) {
+    double total = 0;
+    for (double n : numbers) total += n;
+    return total;
+}
+
+static String concat(String separator, String... parts) {
+    return String.join(separator, parts);
+}
+
+void main() {
+    System.out.println(sum(1, 2, 3));              // 6.0
+    System.out.println(sum(10, 20, 30, 40, 50));   // 150.0
+    System.out.println(sum());                      // 0.0
+
+    System.out.println(concat(", ", "apel", "mangga", "jeruk")); // apel, mangga, jeruk
+    System.out.println(concat(" - ", "Java", "25", "rocks"));    // Java - 25 - rocks
+}
+```
+
+#### Recursion
+
+A recursive method is one that calls itself. Every recursive method needs a base case — a condition that stops the recursion — and a recursive case that moves toward the base case:
+
+```java
+static long factorial(int n) {
+    if (n <= 1) return 1;                  // base case: 0! = 1, 1! = 1
+    return n * factorial(n - 1);           // recursive case
+}
+// factorial(5)
+//   = 5 * factorial(4)
+//   = 5 * 4 * factorial(3)
+//   = 5 * 4 * 3 * factorial(2)
+//   = 5 * 4 * 3 * 2 * factorial(1)
+//   = 5 * 4 * 3 * 2 * 1
+//   = 120
+
+static int fibonacci(int n) {
+    if (n <= 1) return n;                  // base case: fib(0)=0, fib(1)=1
+    return fibonacci(n - 1) + fibonacci(n - 2); // recursive case
+}
+
+void main() {
+    for (int i = 0; i <= 10; i++) {
+        System.out.printf("%d! = %d%n", i, factorial(i));
+    }
+
+    System.out.print("Fibonacci: ");
+    for (int i = 0; i <= 10; i++) {
+        System.out.print(fibonacci(i) + " ");
+    }
+    // Fibonacci: 0 1 1 2 3 5 8 13 21 34 55
+}
+```
+
+### Input from the user
+
+```java
+import java.util.Scanner;
+
+void main() {
+    Scanner scanner = new Scanner(System.in);
+
+    System.out.print("Enter your name: ");
+    String name = scanner.nextLine();         // reads a full line including spaces
+
+    System.out.print("Enter your age: ");
+    int age = scanner.nextInt();              // reads one integer
+    scanner.nextLine();                       // consume the leftover newline character
+                                             // This is IMPORTANT — without it,
+                                             // the next nextLine() will return empty
+
+    System.out.print("Enter your city: ");
+    String city = scanner.nextLine();         // works correctly now
+
+    System.out.print("Enter your GPA: ");
+    double gpa = scanner.nextDouble();
+
+    System.out.println("\n--- Summary ---");
+    System.out.printf("Name: %s%n", name);
+    System.out.printf("Age:  %d%n", age);
+    System.out.printf("City: %s%n", city);
+    System.out.printf("GPA:  %.2f%n", gpa);
+
+    scanner.close();
+}
+```
+
+The `scanner.nextLine()` call after `nextInt()` is a subtle but important detail. When you type `25` and press Enter, `nextInt()` reads the `25` but leaves the Enter key's newline character `\n` sitting in the input buffer. The next `nextLine()` call immediately consumes that leftover newline and returns an empty string instead of waiting for you to type something. The extra `scanner.nextLine()` absorbs the leftover newline so the subsequent read works correctly.
+
+---
+
+## Phase 1 Mini Project — Student Report Card
+
+This project brings together everything from Phase 1: Maven project structure, core syntax, arrays, methods, loops, conditionals, and user input.
+
+```java
+import java.util.Scanner;
+
+public class ReportCard {
+
+    static double calculateAverage(double[] grades) {
+        double total = 0;
+        for (double grade : grades) total += grade;
+        return total / grades.length;
+    }
+
+    static String determineGrade(double average) {
+        return switch (true) {
+            case true when average >= 90 -> "A";
+            case true when average >= 80 -> "B";
+            case true when average >= 70 -> "C";
+            case true when average >= 60 -> "D";
+            default                      -> "E";
+        };
+    }
+
+    static double findHighest(double[] grades) {
+        double max = grades[0];
+        for (double g : grades) if (g > max) max = g;
+        return max;
+    }
+
+    static double findLowest(double[] grades) {
+        double min = grades[0];
+        for (double g : grades) if (g < min) min = g;
+        return min;
+    }
+
+    static void printDivider(int width) {
+        System.out.println("=".repeat(width));
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        printDivider(50);
+        System.out.println("         STUDENT REPORT CARD GENERATOR");
+        printDivider(50);
+
+        System.out.print("Student name     : ");
+        String name = sc.nextLine();
+
+        System.out.print("Student ID       : ");
+        String studentId = sc.nextLine();
+
+        System.out.print("Number of subjects: ");
+        int count = sc.nextInt();
+        sc.nextLine();
+
+        String[] subjects = new String[count];
+        double[] grades   = new double[count];
+
+        System.out.println("\nEnter subject names and grades:");
+        for (int i = 0; i < count; i++) {
+            System.out.printf("  Subject %d name  : ", i + 1);
+            subjects[i] = sc.nextLine();
+
+            System.out.printf("  Subject %d grade : ", i + 1);
+            grades[i] = sc.nextDouble();
+            sc.nextLine();
+            System.out.println();
+        }
+
+        double average = calculateAverage(grades);
+        String grade   = determineGrade(average);
+        double highest = findHighest(grades);
+        double lowest  = findLowest(grades);
+        boolean passed = average >= 60;
+
+        printDivider(50);
+        System.out.println("                REPORT CARD");
+        printDivider(50);
+        System.out.printf("Name       : %s%n", name);
+        System.out.printf("Student ID : %s%n", studentId);
+        printDivider(50);
+
+        System.out.printf("%-20s %10s%n", "SUBJECT", "GRADE");
+        printDivider(50);
+        for (int i = 0; i < count; i++) {
+            System.out.printf("%-20s %10.2f%n", subjects[i], grades[i]);
+        }
+
+        printDivider(50);
+        System.out.printf("%-20s %10.2f%n", "Average",  average);
+        System.out.printf("%-20s %10.2f%n", "Highest",  highest);
+        System.out.printf("%-20s %10.2f%n", "Lowest",   lowest);
+        System.out.printf("%-20s %10s%n",   "Grade",    grade);
+        System.out.printf("%-20s %10s%n",   "Status",   passed ? "PASSED" : "FAILED");
+        printDivider(50);
+
+        sc.close();
+    }
+}
+```
+
+---
+
+## Phase 1 Mastery Checklist
+
+Work through this list honestly before moving to Phase 2. If you cannot do something without looking at notes, go back and practice it.
+
+- [ ] You can explain what bytecode is and why it exists
+- [ ] You can explain the difference between JVM, JRE, and JDK in your own words
+- [ ] You can explain what the garbage collector does and why it matters
+- [ ] You can explain what the JIT compiler does and why it makes Java fast
+- [ ] You have Maven installed and can create a new Maven project from scratch
+- [ ] You understand what pom.xml is and can add a dependency to it
+- [ ] You can run `mvn clean package` and know what each phase does
+- [ ] You understand what a Gradle build script does and how it differs from Maven
+- [ ] You can write a program using Java 25's `void main()` style
+- [ ] You can explain what a record is and write one with custom validation
+- [ ] You can use pattern matching with instanceof and switch
+- [ ] You can use text blocks for multi-line strings
+- [ ] You understand what virtual threads are at a conceptual level
+- [ ] You know all eight primitive types and when to use each
+- [ ] You can perform all type conversions including String parsing
+- [ ] You understand why `==` must not be used to compare Strings
+- [ ] You can use StringBuilder for efficient string construction
+- [ ] You can write if/else chains and switch expressions
+- [ ] You can write for, while, and do-while loops
+- [ ] You understand break and continue and can use them correctly
+- [ ] You can declare, populate, and iterate one-dimensional and two-dimensional arrays
+- [ ] You can write methods with parameters, return values, and overloading
+- [ ] You can write a simple recursive method
+- [ ] You can accept user input with Scanner and handle the newline trap
+- [ ] You can build the mini project from memory
+
+> When every item above is checked, you have a genuine, solid foundation. Phase 2 — Object-Oriented Programming — is where the real power of Java begins to reveal itself.

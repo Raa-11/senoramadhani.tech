@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, fontProviders } from "astro/config";
 import svelte from "@astrojs/svelte";
 import mdx from "@astrojs/mdx";
 import partytown from "@astrojs/partytown";
@@ -7,24 +7,34 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://senoramadhani.tech",
+  site: "https://senoramadhani.my.id",
   integrations: [
     svelte(),
     mdx(),
     partytown({ config: { forward: ["umami.track"] } }),
   ],
+  markdown: {
+    shikiConfig: {
+      themes: {
+        dark: "github-dark",
+        light: "github-light",
+      },
+      defaultColor: false,
+      wrap: true,
+    },
+  },
   fonts: [
     {
       provider: fontProviders.fontsource(),
-      name: 'Fira Code',
-      cssVariable: '--font-fira-code',
-      fallbacks: ['monospace'],
+      name: "Fira Code",
+      cssVariable: "--font-fira-code",
+      fallbacks: ["monospace"],
     },
   ],
   vite: {
     plugins: [tailwindcss()],
     resolve: {
-      noExternal: ['@hugeicons/svelte'],
+      noExternal: ["@hugeicons/svelte"],
     },
   },
 });
