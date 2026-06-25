@@ -54,9 +54,9 @@ html[data-theme="light"] {
     --color-warn: var(--warn);
     --color-danger: var(--danger);
 
-    --font-sans: "Geist", "Space Grotesk", system-ui, sans-serif;
-    --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, monospace;
-    --font-display: "Space Grotesk", system-ui, sans-serif;
+    --font-sans: var(--font-geist);
+    --font-mono: var(--font-jetbrains-mono);
+    --font-display: var(--font-space-grotesk);
 
     --color-background: var(--bg);
     --color-foreground: var(--ink);
