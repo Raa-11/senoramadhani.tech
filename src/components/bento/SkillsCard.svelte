@@ -26,7 +26,7 @@
                 width="15"
                 height="15"
                 class="inline-block shrink-0 dark:invert"
-                loading="eager"
+                loading="lazy"
               />
             {:else if skillColoredMap[s]}
               <img
@@ -35,7 +35,7 @@
                 width="15"
                 height="15"
                 class="inline-block shrink-0 brightness-0 dark:invert"
-                loading="eager"
+                loading="lazy"
               />
             {/if}
             <span>{s}</span>
@@ -59,7 +59,7 @@
                 width="15"
                 height="15"
                 class="inline-block shrink-0 dark:invert"
-                loading="eager"
+                loading="lazy"
               />
             {:else if skillColoredMap[s]}
               <img
@@ -68,7 +68,7 @@
                 width="15"
                 height="15"
                 class="inline-block shrink-0 brightness-0 dark:invert"
-                loading="eager"
+                loading="lazy"
               />
             {/if}
             <span>{s}</span>

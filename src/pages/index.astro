@@ -37,14 +37,14 @@ import SignoffCard from "~/components/bento/SignoffCard.svelte";
 
     <!-- Now + About -->
     <div class="col-span-12 row-span-2 md:col-span-6">
-      <NowCard client:visible />
+      <NowCard client:only="svelte" />
     </div>
     <div class="col-span-12 row-span-2 md:col-span-6">
       <AboutCard client:visible />
     </div>
 
     <!-- Work -->
-    <div class="col-span-12 row-span-3"><WorkCard client:visible /></div>
+    <div class="col-span-12 row-span-3"><WorkCard client:only="svelte" /></div>
 
     <!-- Skills marquee -->
     <div class="col-span-12 flex items-center" style="min-height: 90px">
@@ -69,7 +69,7 @@ import SignoffCard from "~/components/bento/SignoffCard.svelte";
 
     <!-- Log + Signoff -->
     <div class="col-span-12 row-span-2 md:col-span-6">
-      <LogCard client:visible />
+      <LogCard client:only="svelte" />
     </div>
     <div class="col-span-12 row-span-2 md:col-span-6">
       <SignoffCard client:visible />
